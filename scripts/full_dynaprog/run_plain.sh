@@ -1,0 +1,15 @@
+python ./src/dynaprog/run_raw.py \
+    --base_model ./models/Qwen2.5-1.5B \
+    --data_path ./data/full_dynaprog \
+    --save_model_path ./models/full_dynaprog/plain/Qwen2.5-1.5B \
+    --save_result_path ./results/full_dynaprog/plain/Qwen2.5-1.5B \
+    --do_train \
+    --learning_rate 1e-5 \
+    --weight_decay 0 \
+    --grad_clip 1.0 \
+    --train_batch_size 8 \
+    --epoch 1 \
+    --logging_steps 200 \
+    --max_new_tokens 20 \
+    --run_all \
+    --seed 42
