@@ -1,6 +1,9 @@
 # Chain-of-Thought Tokens are Computer Program Variables
 
-![Banner](./promotion.png "Promotion banner drawn by @solitaryzero")
+<div style="text-align: center">
+    <img src="./promotion.png" width="50%">
+    <p style="margin-top: 8px">Banner by @solitaryzero</p>
+</div>
 
 This is the repository for paper [Chain-of-Thought Tokens are Computer Program Variables]() with code and scripts.
 
@@ -57,10 +60,17 @@ sh ./scripts/full_dynaprog/run_latent.sh
 ```
 for multiplication and DP task results.
 
-After executing steps 2-4, you may run `./scripts/full_multiplication/draw_results.sh` and `./scripts/full_dynaprog/draw_results.sh` for accuracy heatmaps.
+### 5. Draw figures for Section 3 (Optional)
+After executing steps 2-4, you may run 
+```shell
+sh ./scripts/full_multiplication/draw_results.sh
+sh ./scripts/full_dynaprog/draw_results.sh
+``` 
+to obtain accuracy heatmaps.
+
 The figures will be generated in `./results/full_multiplication/accuracy` and `./results/full_dynaprog/accuracy`.
 
-### 5. Section 4.1
+### 6. Section 4.1
 You should obtain 4\*4 multiplication and 5\*5 DP results first.
 Then, execute
 ```shell
@@ -70,11 +80,12 @@ sh ./scripts/{task}/run_intervention.sh
 to perform intervention experiments, where `{task}` belongs to `{multiplication, dynaprog}`
 
 Run `sh ./scripts/misc/draw_intervention.sh` to generate intervention success rate figures.
+
 Run `sh ./scripts/multiplication/error_analysis.sh` to generate error breakdown figures.
 
 The figures will be generated as `./results/misc/intervene_accuracy.pdf` and `./results/multiplication/error/error_breakdown.pdf`.
 
-### 6. Section 4.2
+### 7. Section 4.2
 You should obtain 5\*5 DP results first.
 Then, execute
 ```shell
