@@ -5,7 +5,7 @@
     <p style="margin-top: 8px">Banner by @solitaryzero</p>
 </div>
 
-This is the repository for paper [Chain-of-Thought Tokens are Computer Program Variables]() with code and scripts.
+This is the repository for paper [Chain-of-Thought Tokens are Computer Program Variables](https://arxiv.org/abs/2505.04955) with code and scripts.
 
 ## Setup
 Before running the code, you should install the dependencies by:
