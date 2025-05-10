@@ -31,8 +31,8 @@ def main(args, tasks):
                     df_dict['Layer'].append(layer)
                     df_dict['Compression'].append(task)
 
-                    df_dict['Value'].append(res['entry_accuracy'])
-                    df_dict['Accuracy Metric'].append('entry')
+                    df_dict['Value'].append(res['token_accuracy'])
+                    df_dict['Accuracy Metric'].append('token')
                     df_dict['Layer'].append(layer)
                     df_dict['Compression'].append(task)
 

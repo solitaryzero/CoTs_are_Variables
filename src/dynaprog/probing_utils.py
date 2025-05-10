@@ -22,8 +22,12 @@ def collect_embeds(
     save_path,
 ):
     n_layers = model.config.num_hidden_layers
-    all_embeds = [[] for _ in range(n_layers)]
+    file_handles = []
     metadata = []
+
+    for layer in range(n_layers):
+        fout = open(os.path.join(save_path, f'{layer}.embeds'), 'wb')
+        file_handles.append(fout)
 
     for entry in tqdm(dataset):
         metadata.append({
@@ -83,14 +87,15 @@ def collect_embeds(
                 x_embeds = shifted_hidden[token_mask].detach().cpu().numpy()
                 y_embeds = np.array(entry['latent_embeds'])
                 assert (x_embeds.shape[0] == y_embeds.shape[0])
-                all_embeds[layer].append({
+
+                d = {
                     'x': x_embeds,
                     'y': y_embeds,
-                })
+                }
+                pickle.dump(d, file_handles[layer])
 
-    for layer in range(n_layers):
-        with open(os.path.join(save_path, f'{layer}.embeds'), 'wb') as fout:
-            pickle.dump(all_embeds[layer], fout)
+    for fout in file_handles:
+        fout.close()
 
     with open(os.path.join(save_path, f'metadata.json'), 'w', encoding='utf-8') as fout:
         json.dump(metadata, fout)

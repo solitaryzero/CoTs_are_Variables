@@ -22,9 +22,15 @@ def read_metadata(args, spl):
 
 
 def read_embeds(args, spl, layer):
+    dataset = []
     embed_path = os.path.join(args.data_path, spl)
     with open(os.path.join(embed_path, f'{layer}.embeds'), 'rb') as fin:
-        dataset = pickle.load(fin)
+        while True:
+            try:
+                d = pickle.load(fin)
+                dataset.append(d)
+            except EOFError:
+                break
     return dataset
 
 
@@ -133,7 +139,7 @@ def train(
             fout.write(json.dumps(results, indent=4))
 
         epoch_results.append(results)
-        ls = [best_score, results["entry_accuracy"]]
+        ls = [best_score, results["token_accuracy"]]
         li = [best_epoch_idx, epoch_idx]
 
         best_score = ls[np.argmax(ls)]
@@ -211,7 +217,6 @@ def main(args):
     logger = setup_logger('Prober', params['output_path'])
 
     # training
-    # metadata = read_metadata(args, 'train')
     num_layers = args.num_layers
 
     for layer in tqdm(range(num_layers), desc='Layer'):

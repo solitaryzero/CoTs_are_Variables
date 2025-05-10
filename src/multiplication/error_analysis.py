@@ -141,7 +141,7 @@ def draw_stats(args, stats):
         return f'{pct:.1f}%' if pct > 5 else ''
 
     plt.figure(figsize=(8, 6))
-    plt.subplots_adjust(left=0.1, right=0.7)  # 右侧留更多空间
+    plt.subplots_adjust(left=0.1, right=0.7)
     wedges, _, _ = plt.pie(
         sizes, 
         labels=None, 

@@ -6,6 +6,5 @@ python ./src/dynaprog/probe_breakdown.py \
     --hidden_size 1536 \
     --target_dim 50 \
     --cuda \
-    --quickdraw \
     --format pdf \
     --seed 42

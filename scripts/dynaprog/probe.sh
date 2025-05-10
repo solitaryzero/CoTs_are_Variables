@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=4 python ./src/dynaprog/probe.py \
+python ./src/dynaprog/probe.py \
     --data_path ./data/dynaprog/probe/Qwen2.5-1.5B \
     --output_path ./models/dynaprog/probe/Qwen2.5-1.5B \
     --num_layers 28 \
@@ -13,7 +13,7 @@ CUDA_VISIBLE_DEVICES=4 python ./src/dynaprog/probe.py \
     --print_interval 2000 \
     --shuffle 
 
-CUDA_VISIBLE_DEVICES=4 python ./src/dynaprog/probe.py \
+python ./src/dynaprog/probe.py \
     --data_path ./data/dynaprog/probe_row/Qwen2.5-1.5B \
     --output_path ./models/dynaprog/probe_row/Qwen2.5-1.5B \
     --num_layers 28 \

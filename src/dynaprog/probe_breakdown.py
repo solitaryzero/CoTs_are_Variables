@@ -27,9 +27,15 @@ def read_metadata(args, spl):
 
 
 def read_embeds(args, spl, layer):
+    dataset = []
     embed_path = os.path.join(args.data_path, spl)
     with open(os.path.join(embed_path, f'{layer}.embeds'), 'rb') as fin:
-        dataset = pickle.load(fin)
+        while True:
+            try:
+                d = pickle.load(fin)
+                dataset.append(d)
+            except EOFError:
+                break
     return dataset
 
 

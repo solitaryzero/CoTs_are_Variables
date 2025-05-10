@@ -49,11 +49,6 @@ Result: 25735633"""
 def parse_cot(
     text,
 ):
-    # cot_parts = {
-    #     'partial_mul': [],
-    #     'addition': [],
-    #     'final_result': [],
-    # }
     cot_parts = {
         'partial_mul': [],
     }
