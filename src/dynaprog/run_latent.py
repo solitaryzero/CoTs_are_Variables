@@ -9,7 +9,7 @@ import torch
 from transformers import TrainingArguments, Trainer, GenerationConfig
 
 from utils import parse_dataset_name, process_latent_dataset
-from model import LatentQwen2, LatentTokenizer
+from model import LatentQwen2, LatentTokenizer, LatentLlama, LatentLlamaTokenizer
 
 def run(
     args,
@@ -17,11 +17,23 @@ def run(
     test_dataset,
     save_model_path,
 ):  
-    tokenizer = LatentTokenizer.from_pretrained(args.base_model)
     if (args.do_train):
-        model = LatentQwen2.from_pretrained(args.base_model, latent_dim=args.latent_dim).cuda()
+        model_path = args.base_model
     else:
-        model = LatentQwen2.from_pretrained(args.save_model_path, latent_dim=args.latent_dim).cuda()
+        model_path = args.save_model_path
+
+    if ('qwen' in args.base_model.lower()):
+        tokenizer = LatentTokenizer.from_pretrained(args.base_model)
+    elif ('llama' in args.base_model.lower()):
+        tokenizer = LatentLlamaTokenizer.from_pretrained(args.base_model)
+
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+
+    if ('qwen' in model_path.lower()):
+        model = LatentQwen2.from_pretrained(model_path, latent_dim=args.latent_dim).cuda()
+    elif ('llama' in model_path.lower()):
+        model = LatentLlama.from_pretrained(model_path, latent_dim=args.latent_dim).cuda()
     model.generation_config.pad_token_id = tokenizer.pad_token_id
 
     # Train
@@ -31,6 +43,7 @@ def run(
             latent_dim=args.latent_dim, 
             tokenizer=tokenizer,
             compress=args.compress,
+            add_buffer=('llama' in args.base_model.lower()),
         )
     
         if (len(dataset) < 10000):
@@ -41,7 +54,7 @@ def run(
         dummy_latent = [0 for _ in range(args.latent_dim)]
         def tokenize_function(element):
             full_tokens = tokenizer(
-                element['prompt']+'<|endoftext|>',
+                element['prompt']+tokenizer.eos_token,
                 truncation=True,
                 max_length=2048,
                 add_special_tokens=True,
@@ -218,6 +231,10 @@ def main(args):
             if (args.resume_interruption):
                 out_path = os.path.join(args.save_result_path, f'{da}_mul_{db}_scores.json')
                 if (os.path.isfile(out_path)): # executed beforehand
+                    key = f'{da},{db}'
+                    with open(out_path, 'r', encoding='utf-8') as fin:
+                        result = json.load(fin)
+                    all_results[key] = result
                     continue
 
             print(f'=== Running {da}_mul_{db} ===')

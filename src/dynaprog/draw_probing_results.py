@@ -7,13 +7,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set_context(rc={"axes.labelsize":20, "legend.fontsize":16, "legend.title_fontsize":16})
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 
 def main(args, tasks):
     df_dict = {
         'Value': [],
         'Accuracy Metric': [],
         'Layer': [],
-        'Compression': [],
+        'Merge': [],
     }
 
     for task in tasks:
@@ -29,12 +32,12 @@ def main(args, tasks):
                     df_dict['Value'].append(res['element_accuracy'])
                     df_dict['Accuracy Metric'].append('element')
                     df_dict['Layer'].append(layer)
-                    df_dict['Compression'].append(task)
+                    df_dict['Merge'].append(task)
 
                     df_dict['Value'].append(res['token_accuracy'])
                     df_dict['Accuracy Metric'].append('token')
                     df_dict['Layer'].append(layer)
-                    df_dict['Compression'].append(task)
+                    df_dict['Merge'].append(task)
 
     df = pd.DataFrame.from_dict(df_dict)
     plt.figure(figsize=(6,4), constrained_layout=True)
@@ -42,7 +45,7 @@ def main(args, tasks):
         x='Layer',
         y='Value',
         hue='Accuracy Metric',
-        style='Compression',
+        style='Merge',
         data=df,
     )
     fig.set_title("Probe Accuracy", fontsize=20)
@@ -64,8 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--format', type=str, choices=['png', 'pdf'], default='png')
 
     tasks = {
-        'none': './models/dynaprog/probe/Qwen2.5-1.5B',
-        'row': './models/dynaprog/probe_row/Qwen2.5-1.5B',
+        'w/o merge': './models/dynaprog/probe/Qwen2.5-1.5B',
+        'w/ merge': './models/dynaprog/probe_row/Qwen2.5-1.5B',
     }
 
     args = parser.parse_args()

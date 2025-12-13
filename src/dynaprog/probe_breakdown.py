@@ -19,6 +19,8 @@ import seaborn as sns
 from probing_utils import LinearProber, setup_logger
 
 sns.set_context(rc={"axes.labelsize":20, "legend.fontsize":16, "legend.title_fontsize":16})
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
 
 def read_metadata(args, spl):
     with open(os.path.join(args.data_path, spl, 'metadata.json')) as fin:

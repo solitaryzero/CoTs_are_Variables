@@ -1,0 +1,15 @@
+CUDA_VISIBLE_DEVICES=6 python ./src/dynaprog/run_latent.py \
+    --base_model ./models/Qwen2.5-1.5B \
+    --data_path ./data/full_dynaprog/1_mul_4.json \
+    --save_model_path ./models/full_dynaprog/latent/Qwen2.5-1.5B/1_mul_4 \
+    --save_result_path ./results/full_dynaprog/latent/Qwen2.5-1.5B \
+    --latent_dim 50 \
+    --do_train \
+    --learning_rate 1e-5 \
+    --weight_decay 0 \
+    --grad_clip 1.0 \
+    --train_batch_size 4 \
+    --epoch 1 \
+    --logging_steps 200 \
+    --max_new_tokens 1024 \
+    --seed 42

@@ -9,6 +9,8 @@ import pandas as pd
 from intervene_utils import parse_cot, simulate_partial_cot
 
 sns.set_context(rc={"axes.labelsize":20, "legend.fontsize":18, "legend.title_fontsize":20})
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
 
 # Error types:
 # 1. Addition error: error in large number addition
@@ -148,10 +150,10 @@ def draw_stats(args, stats):
         autopct=autopct, 
         # explode=explode,
         startangle=90, 
-        textprops={'fontsize': 20},
+        textprops={'fontsize': 30},
         colors=sns.color_palette("pastel")
     )
-    plt.title("Error breakdown", fontsize=20)
+    plt.title("Error breakdown", fontsize=30)
     plt.axis('equal')
    
     plt.legend(

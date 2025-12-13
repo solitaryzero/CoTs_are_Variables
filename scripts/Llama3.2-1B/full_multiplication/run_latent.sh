@@ -1,0 +1,17 @@
+CUDA_VISIBLE_DEVICES=6 python ./src/multiplication/run_latent.py \
+    --base_model ./models/Llama-3.2-1B \
+    --data_path ./data/multiplication \
+    --save_model_path ./models/full_multiplication/latent/Llama-3.2-1B \
+    --save_result_path ./results/full_multiplication/latent/Llama-3.2-1B \
+    --latent_dim 20 \
+    --do_train \
+    --learning_rate 1e-5 \
+    --weight_decay 0 \
+    --grad_clip 1.0 \
+    --train_batch_size 4 \
+    --epoch 1 \
+    --bf16 \
+    --run_all \
+    --logging_steps 200 \
+    --max_new_tokens 1024 \
+    --seed 42

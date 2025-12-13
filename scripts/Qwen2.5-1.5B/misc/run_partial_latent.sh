@@ -1,0 +1,17 @@
+CUDA_VISIBLE_DEVICES=6 python ./src/misc/run_partial_latent.py \
+    --base_model ./models/Qwen2.5-1.5B \
+    --pretrained_model ./models/full_dynaprog/latent/Qwen2.5-1.5B/5_mul_5 \
+    --data_path ./data/full_dynaprog/5_mul_5.json \
+    --save_model_path ./models/misc/partial/Qwen2.5-1.5B/5_mul_5_row \
+    --save_result_path ./results/misc/partial/Qwen2.5-1.5B \
+    --do_train \
+    --latent_dim 50 \
+    --compress row \
+    --learning_rate 1e-5 \
+    --weight_decay 0 \
+    --grad_clip 1.0 \
+    --train_batch_size 4 \
+    --epoch 1 \
+    --logging_steps 200 \
+    --max_new_tokens 1024 \
+    --seed 42

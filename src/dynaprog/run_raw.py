@@ -20,6 +20,9 @@ def run(
     tokenizer = AutoTokenizer.from_pretrained(args.base_model)
     model.generation_config.pad_token_id = tokenizer.pad_token_id
 
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+
     # Train
     if (args.do_train):
         model = AutoModelForCausalLM.from_pretrained(args.base_model).cuda()
@@ -28,7 +31,7 @@ def run(
         dataset = process_dataset(train_dataset)
         def tokenize_function(element):
             full_tokens = tokenizer(
-                element['prompt']+'<|endoftext|>',
+                element['prompt']+tokenizer.eos_token,
                 truncation=True,
                 max_length=2048,
                 add_special_tokens=True,

@@ -1,5 +1,5 @@
 python ./src/dynaprog/draw_results.py \
-    --data_path ./results/full_dynaprog/plain/Qwen2.5-1.5B/all_scores.json \
+    --data_path ./results/full_dynaprog/plain/Qwen2.5-1.5B \
     --out_path ./results/full_dynaprog/accuracy \
     --from_separate_files \
     --prompt_type plain \

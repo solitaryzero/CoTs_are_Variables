@@ -8,6 +8,8 @@ import seaborn as sns
 import pandas as pd
 
 sns.set_context(rc={"axes.labelsize":20, "legend.fontsize":16, "legend.title_fontsize":16})
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
 
 def main(args):
     df_dict = {

@@ -1,0 +1,16 @@
+CUDA_VISIBLE_DEVICES=7 python ./src/dynaprog/run_cot.py \
+    --base_model ./models/Llama-3.2-1B \
+    --data_path ./data/full_dynaprog \
+    --save_model_path ./models/full_dynaprog/full_cot/Llama-3.2-1B \
+    --save_result_path ./results/full_dynaprog/full_cot/Llama-3.2-1B \
+    --do_train \
+    --learning_rate 1e-5 \
+    --weight_decay 0 \
+    --grad_clip 1.0 \
+    --train_batch_size 4 \
+    --epoch 1 \
+    --logging_steps 200 \
+    --max_new_tokens 1024 \
+    --run_all \
+    --resume_interruption \
+    --seed 42

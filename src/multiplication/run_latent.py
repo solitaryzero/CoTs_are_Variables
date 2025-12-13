@@ -9,7 +9,7 @@ import torch
 from transformers import TrainingArguments, Trainer, GenerationConfig
 
 from utils import parse_dataset_name, process_latent_dataset
-from model import LatentQwen2, LatentTokenizer
+from model import LatentQwen2, LatentTokenizer, LatentLlama, LatentLlamaTokenizer
 
 def run(
     args,
@@ -17,21 +17,41 @@ def run(
     test_dataset,
     save_model_path,
 ):  
-    tokenizer = LatentTokenizer.from_pretrained(args.base_model)
     if (args.do_train):
-        model = LatentQwen2.from_pretrained(args.base_model, latent_dim=args.latent_dim).cuda()
+        model_path = args.base_model
     else:
-        model = LatentQwen2.from_pretrained(args.save_model_path, latent_dim=args.latent_dim).cuda()
+        model_path = args.save_model_path
+
+    if ('qwen' in args.base_model.lower()):
+        tokenizer = LatentTokenizer.from_pretrained(args.base_model)
+    elif ('llama' in args.base_model.lower()):
+        tokenizer = LatentLlamaTokenizer.from_pretrained(args.base_model)
+
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+
+    if ('qwen' in model_path.lower()):
+        model = LatentQwen2.from_pretrained(model_path, latent_dim=args.latent_dim).cuda()
+    elif ('llama' in model_path.lower()):
+        model = LatentLlama.from_pretrained(model_path, latent_dim=args.latent_dim).cuda()
+
     model.generation_config.pad_token_id = tokenizer.pad_token_id
     # model.bind_tokenizer(tokenizer)
 
     # Train
     if (args.do_train):
-        dataset = process_latent_dataset(train_dataset, latent_dim=args.latent_dim, tokenizer=tokenizer)
+        add_space = ('llama' in model_path.lower()) # patch for llama tokenizer
+
+        dataset = process_latent_dataset(
+            train_dataset, 
+            latent_dim=args.latent_dim,
+            tokenizer=tokenizer,
+            add_space=add_space,
+        )
         dummy_latent = [0 for _ in range(args.latent_dim)]
         def tokenize_function(element):
             full_tokens = tokenizer(
-                element['prompt']+'<|endoftext|>',
+                element['prompt']+tokenizer.eos_token,
                 truncation=True,
                 max_length=2048,
                 add_special_tokens=True,
@@ -40,8 +60,11 @@ def run(
                 element['query'],
                 truncation=True,
                 max_length=2048,
-                add_special_tokens=False,
+                add_special_tokens=True,
             )
+            # print(tokenizer.convert_ids_to_tokens(full_tokens['input_ids']))
+            # print(tokenizer.convert_ids_to_tokens(query_tokens['input_ids']))
+            # input()
 
             full_tokens['query_ids'] = query_tokens['input_ids']
             full_tokens['latent_embeds'] = element['latent_embeds']
@@ -162,7 +185,7 @@ def run(
         decoded = tokenizer.decode(generation_outputs.sequences[0], skip_special_tokens=True)
         golden = entry['golden']
         try:
-            prediction = int(decoded.strip().split('Result: ')[-1])
+            prediction = int(decoded.strip().split('Result: ')[-1].replace(' ', ''))
         except:
             prediction = -1
         

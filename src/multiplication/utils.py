@@ -25,7 +25,7 @@ def parse_dataset_name(data_path):
     return da, db
 
 
-def generate_full_cot(a, b):
+def generate_full_cot(a, b, add_space=False):
     str_a, str_b = str(a), str(b)
     steps = []
     partial_results = []
@@ -33,7 +33,10 @@ def generate_full_cot(a, b):
         db = int(str_b[ib])
         n_zero = len(str_b)-ib-1
         zeros = '0'*n_zero
-        current_step = f'Calculate {str_a}*{db}{zeros}\n'
+        if (add_space):
+            current_step = f"Calculate {' '.join(str_a)}*{' '.join(str(db)+zeros)}\n"
+        else:
+            current_step = f'Calculate {str_a}*{db}{zeros}\n'
         carry = 0
         for ia in range(len(str_a)-1, -1, -1): # from tail of a
             da = int(str_a[ia])
@@ -41,7 +44,10 @@ def generate_full_cot(a, b):
             rem, carry = t%10, t//10
             current_step += f'{da}*{db}={da*db}, digit {rem}, carry {carry}\n'
 
-        current_step += f'Result of {a}*{db}{zeros}={a*db}{zeros}'
+        if (add_space):
+            current_step += (f'Result of {a}*{db}{zeros}=' + ' '.join(f'{a*db}{zeros}'))
+        else:
+            current_step += f'Result of {a}*{db}{zeros}={a*db}{zeros}'
         steps.append(current_step)
         partial_results.append(a*db*(10**n_zero))
 
@@ -73,7 +79,7 @@ def generate_full_cot(a, b):
     return full_cot
 
 
-def generate_compressed_cot(a, b):
+def generate_compressed_cot(a, b, add_space=False):
     str_a, str_b = str(a), str(b)
     steps = []
     partial_results = []
@@ -81,7 +87,10 @@ def generate_compressed_cot(a, b):
         db = int(str_b[ib])
         n_zero = len(str_b)-ib-1
         zeros = '0'*n_zero
-        current_step = f'{str_a}*{db}{zeros}\n'
+        if (add_space):
+            current_step = f"{' '.join(str_a)}*{' '.join(str(db)+zeros)}\n"
+        else:
+            current_step = f'{str_a}*{db}{zeros}\n'
         carry = 0
         for ia in range(len(str_a)-1, -1, -1): # from tail of a
             da = int(str_a[ia])
@@ -89,7 +98,10 @@ def generate_compressed_cot(a, b):
             rem, carry = t%10, t//10
             current_step += f'{da}*{db} {rem} {carry}\n'
 
-        current_step += f'{a}*{db}{zeros}={a*db}{zeros}'
+        if (add_space):
+            current_step += (f'{a}*{db}{zeros}=' + ' '.join(f'{a*db}{zeros}'))
+        else:
+            current_step += f'{a}*{db}{zeros}={a*db}{zeros}'
         steps.append(current_step)
         partial_results.append(a*db*(10**n_zero))
 
@@ -121,7 +133,7 @@ def generate_compressed_cot(a, b):
     return full_cot
 
 
-def process_cot_dataset(raw_dataset, cot_type='full'):    
+def process_cot_dataset(raw_dataset, latent_start_token, latent_end_token, cot_type='full', add_space=False):    
     all_data = {
         'id': [], 
         'query': [], 
@@ -136,10 +148,10 @@ def process_cot_dataset(raw_dataset, cot_type='full'):
 
         a, b = entry['a'], entry['b']
         if (cot_type == 'full'):
-            cot = generate_full_cot(a, b)
+            cot = generate_full_cot(a, b, add_space=add_space)
         elif (cot_type == 'compressed'):
-            cot = generate_compressed_cot(a, b)
-        prompt = entry['query'] + '<tool_call>' + cot + '</tool_call>'
+            cot = generate_compressed_cot(a, b, add_space=add_space)
+        prompt = entry['query'] + latent_start_token + cot + latent_end_token
         prompt += f'\n\nResult: {str(a*b)}'
         all_data['prompt'].append(prompt)
 
@@ -147,7 +159,7 @@ def process_cot_dataset(raw_dataset, cot_type='full'):
     return processed_dataset
 
 
-def generate_latent_cot(a, b, tokenizer, latent_dim):
+def generate_latent_cot(a, b, tokenizer, latent_dim, add_space=False):
     latent_token = tokenizer.latent_token
     latent_embeds = []
 
@@ -158,7 +170,10 @@ def generate_latent_cot(a, b, tokenizer, latent_dim):
         db = int(str_b[ib])
         n_zero = len(str_b)-ib-1
         zeros = '0'*n_zero
-        current_step = f'{str_a}*{db}{zeros}\n'
+        if (add_space):
+            current_step = f"{' '.join(str_a)}*{' '.join(str(db)+zeros)}\n"
+        else:
+            current_step = f'{str_a}*{db}{zeros}\n'
         carry = 0
         for ia in range(len(str_a)-1, -1, -1): # from tail of a
             da = int(str_a[ia])
@@ -172,7 +187,10 @@ def generate_latent_cot(a, b, tokenizer, latent_dim):
             emb[(latent_dim//2)+carry] = 1
             latent_embeds.append(emb)
 
-        current_step += f'|{a*db}{zeros}'
+        if (add_space):
+            current_step += ' '.join(f'|{a*db}{zeros}')
+        else:
+            current_step += f'|{a*db}{zeros}'
         steps.append(current_step)
         partial_results.append(a*db*(10**n_zero))
 
@@ -208,6 +226,7 @@ def process_latent_dataset(
     raw_dataset, 
     tokenizer,
     latent_dim=64,
+    add_space=False,
 ):
     all_data = {
         'id': [], 
@@ -223,8 +242,8 @@ def process_latent_dataset(
         all_data['golden'].append(entry['golden'])
 
         a, b, golden = entry['a'], entry['b'], entry['golden']
-        cot, latent_embeds = generate_latent_cot(a, b, tokenizer, latent_dim)
-        prompt = entry['query'] + '<tool_call>' + cot + '</tool_call>'
+        cot, latent_embeds = generate_latent_cot(a, b, tokenizer, latent_dim, add_space=add_space)
+        prompt = entry['query'] + tokenizer.latent_start_token + cot + tokenizer.latent_end_token
         prompt += f'\n\nResult: {str(a*b)}'
         all_data['prompt'].append(prompt)
         all_data['latent_embeds'].append(latent_embeds)

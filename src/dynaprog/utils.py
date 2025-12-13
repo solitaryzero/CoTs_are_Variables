@@ -69,7 +69,12 @@ def generate_cot(table):
     return full_cot
 
 
-def process_cot_dataset(raw_dataset):    
+def process_cot_dataset(
+    raw_dataset,
+    latent_start_token,
+    latent_end_token,
+    add_buffer=False,
+):    
     all_data = {
         'id': [], 
         'query': [], 
@@ -84,8 +89,11 @@ def process_cot_dataset(raw_dataset):
 
         table = entry['table']
         cot = generate_cot(table)
-        prompt = entry['query'] + '<tool_call>' + cot + '</tool_call>'
-        prompt += f'\n\nResult: {entry['golden']}'
+        prompt = entry['query'] + latent_start_token + cot + latent_end_token
+        if (add_buffer):
+            prompt += f'{' '.join(str(entry['golden']))}\n\nResult: {entry['golden']}'
+        else:
+            prompt += f'\n\nResult: {entry['golden']}'
         all_data['prompt'].append(prompt)
 
     processed_dataset = Dataset.from_dict(all_data)
@@ -131,6 +139,7 @@ def process_latent_dataset(
     tokenizer,
     latent_dim=50,
     compress='none',
+    add_buffer=False,
 ):
     all_data = {
         'id': [], 
@@ -152,8 +161,11 @@ def process_latent_dataset(
             latent_dim=latent_dim,
             compress=compress,
         )
-        prompt = entry['query'] + '<tool_call>' + cot + '</tool_call>'
-        prompt += f'\n\nResult: {entry['golden']}'
+        prompt = entry['query'] + tokenizer.latent_start_token + cot + tokenizer.latent_end_token
+        if (add_buffer):
+            prompt += f'{' '.join(str(entry['golden']))}\n\nResult: {entry['golden']}'
+        else:
+            prompt += f'\n\nResult: {entry['golden']}'
         all_data['prompt'].append(prompt)
         all_data['latent_embeds'].append(latent_embeds)
 

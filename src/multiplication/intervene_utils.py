@@ -520,6 +520,36 @@ def modify_cot(
     return new_cot_steps, modification
 
 
+def modify_cot_outscope(
+    text,
+    step_type,
+    out_of_scope=False,
+):
+    try:
+        cot_steps = parse_cot(text)
+    except:
+        print(text)
+        return None, None
+
+    flat_steps = []
+    for module in cot_steps:
+        for i, step in enumerate(cot_steps[module]):
+            if not((module == 'partial_mul') and ((step['type'] == 'abstract') or (step['type'] == 'summary'))): # Avoid vague modification
+                flat_steps.append({
+                    'module': module,
+                    'index': i,
+                })
+            
+    sampled_step = random.choice(flat_steps)
+    new_cot_steps = {}
+    step = cot_steps[sampled_step['module']][sampled_step['index']]
+    modification = {
+        'module': sampled_step['module'],
+        'type': step['type'],
+        'index': sampled_step['index'],
+    }
+
+
 def unit_test():
     # random.seed(123)
 
